@@ -1,0 +1,23 @@
+language: python
+python:
+  - 3.7.3
+services:
+  - docker
+before_install:
+  - python --version
+  - pip install -r requirements.txt
+  - pip install -U pip
+  - pip install -U pytest
+  - pip install codecov
+  #install:
+  # - pip install ".[test]" . # install package + test dependencies
+script:
+  - pytest # run tests
+  - docker build -t cctv-streamer .
+after_success:
+  - codecov # submit coverage
+  - docker login docker.pkg.github.com -u $USERNAME --password $TOKEN
+  - docker tag tweetbot docker.pkg.github.com/jaimehisao/cctv-streamer/cctv-streamer:$TRAVIS_BUILD_NUMBER
+  - docker push docker.pkg.github.com/jaimehisao/cctv-streamer/cctv-streamer:$TRAVIS_BUILD_NUMBER
+  - docker tag tweetbot docker.pkg.github.com/jaimehisao/cctv-streamer/cctv-streamer:latest
+  - docker push docker.pkg.github.com/jaimehisao/cctv-streamer/cctv-streamer:latest
